@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import { 
     View, 
     ImageBackground, 
@@ -11,8 +12,28 @@ import {
 } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
 import { styles } from './register.style';
+import { useAuthStore } from '../../store/auth.store';
 
 export const RegisterScreen = () => {
+    const createLocalUser = useAuthStore(state => state.createLocalUser)
+    const registerUser = useAuthStore(state => state.registerUser);
+
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+    
+    const handleRegister = () => {
+        if (!email.trim()) {
+            return;
+        }
+
+        registerUser({ name, email });
+    }
+
+    const handleContinueWithoutRegistration = () => {
+        createLocalUser();
+    }
+
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <KeyboardAvoidingView
@@ -44,12 +65,18 @@ export const RegisterScreen = () => {
                                 style={styles.input}
                                 label={'Email'}
                                 mode='outlined'
+                                value={email}
+                                onChangeText={setEmail}
+                                autoCapitalize='none'
+                                keyboardType='email-address'
                             />
 
                             <TextInput
                                 style={styles.input}
                                 label={'Пароль'}
                                 mode='outlined'
+                                value={password}
+                                onChangeText={setPassword}
                                 secureTextEntry
                             />
 
@@ -57,17 +84,20 @@ export const RegisterScreen = () => {
                                 style={styles.input}
                                 label={'Имя'}
                                 mode='outlined'
+                                value={name}
+                                onChangeText={setName}
                             />
 
                             <Button
                                 mode='contained'
                                 style={styles.primaryButton}
                                 contentStyle={styles.primaryButtonContent}
+                                onPress={handleRegister}
                             >   
-                                Продолжить
+                                Зарегистрировать аккаунт
                             </Button>
 
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={handleContinueWithoutRegistration}>
                                 <Text style={styles.secondaryAction}>
                                     Продолжить без регистрации
                                 </Text>
