@@ -16,6 +16,9 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const AppNavigator = () => {
     const user = useAuthStore((state) => state.user);
+    const isAuth = !!user;
+
+    const isPendingRegistration = user?.isRegistered && user?.isNeedToSync;
 
     return (
         <Stack.Navigator
@@ -28,15 +31,19 @@ export const AppNavigator = () => {
                 animationDuration: 450,
             }}
         >
-            {user ? 
+            {!isAuth ? (
+                <>
+                    <Stack.Screen name='Welcome' component={WelcomeScreen} />
+                    <Stack.Screen name='Register' component={RegisterScreen} />
+                </>
+            ) : isPendingRegistration ? (
+                <>
+                    <Stack.Screen name='Register' component={RegisterScreen} />
+                    <Stack.Screen name='RoutineSchedule' component={RoutineScheduleScreen} />
+                </>
+            ) : (
                 <Stack.Screen name='RoutineSchedule' component={RoutineScheduleScreen} />
-                : (
-                    <>
-                        <Stack.Screen name='Welcome' component={WelcomeScreen} />
-                        <Stack.Screen name='Register' component={RegisterScreen} />
-                    </>
-                )
-            }
+            )}
             
         </Stack.Navigator>
     );

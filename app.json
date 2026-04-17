@@ -26,7 +26,11 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "API_URL": "https://yourfriend-rnd-projects.ru"
+    }
   }
 }

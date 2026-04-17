@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 type User = {
     id: string;
@@ -10,12 +9,14 @@ type User = {
     name?: string;
     isRegistered: boolean;
     isNeedToSync: boolean;
+    createdAt: Date;
+    updatedAt?: Date;
 }
 
 interface AuthState {
     user: User | null;
     createLocalUser: () => void;
-    registerUser: (data: { email: string, name: string }) => void;
+    registerUser: (data: { email: string, name: string, isNeedToSync: boolean, id?: string, createdAt?: Date }) => void;
     logout: () => void;
     reset: () => void;
     markSynced: () => void;
@@ -37,21 +38,23 @@ export const useAuthStore = create<AuthState>()(
                     id: Crypto.randomUUID(),
                     isRegistered: false,
                     isNeedToSync: false,
+                    createdAt: new Date(),
                 }
 
                 set({ user });
             },
 
-            registerUser: ({ email, name }) => {
+            registerUser: ({ email, name, id, createdAt, isNeedToSync }) => {
                 const currentUser = get().user;
 
                 if (!currentUser) {
                     const user: User = {
-                        id: Crypto.randomUUID(),
+                        id: id || Crypto.randomUUID(),
                         isRegistered: true,
-                        isNeedToSync: true,
+                        isNeedToSync,
                         name,
                         email,
+                        createdAt: createdAt || new Date(),
                     }
 
                     set({ user })
@@ -61,7 +64,7 @@ export const useAuthStore = create<AuthState>()(
                         email,
                         name,
                         isRegistered: true,
-                        isNeedToSync: true,
+                        isNeedToSync,
                     }})
                 }
             },
